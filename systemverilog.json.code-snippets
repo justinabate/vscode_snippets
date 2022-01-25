@@ -1,0 +1,216 @@
+{
+	//! VScode snippets for SystemVerilog 
+
+	//! ** naming assumptions:
+	//! G_IWS    - input word size
+	//! G_OWS    - output word size
+	//! i_clk    - input clock signal 
+	//! i_srst_n - input synchronous reset 
+	//! i_arst_n - input async reset 
+	//! w_fsm_ns - FSM next state signal
+	//! r_fsm_cs - FSM current state signal
+
+	//! Snippet variables syntax: 
+	//!   $1, $2 for tab stops, 
+	//!   $0 for the final cursor position,
+	//!   ${1:label}, ${2:another} for placeholders. 
+	//!   Placeholders with the same ids are connected.
+
+
+	"combinatorial process": {
+		"prefix": "always_comb",
+		"body": ["//! Combinatorial process",
+			"always_comb begin : ${1:p_comb_}",
+			"\t$0",
+			"end"
+		]
+	},
+
+	"sequential process; asynchronous active-low reset": {
+		"prefix": "always_ff async reset",
+		"body": ["//! Sequential process; asynchronous active-low reset",
+			"always_ff @( posedge ${1:i_clk} or negedge ${2:i_arst_n} ) begin : ${3:p_sync_}",
+			"\tif (~i_arst_n) begin",
+			"\t\t$0",
+			"\tend else begin",
+			"\t\t",
+			"\tend",
+			"end" ]
+	},
+
+	"sequential process; synchronous active-low reset": {
+		"prefix": "always_ff sync reset",
+		"body": ["//! Sequential process; synchronous active-low reset",
+			"always_ff @( posedge ${1:i_clk} ) begin : ${2:p_sync_}",
+			"\tif (~i_srst_n) begin",
+			"\t\t$0",
+			"\tend else begin",
+			"\t\t",
+			"\tend",
+			"end" ]
+	},
+
+	"sequential process; no reset": {
+		"prefix": "always_ff without reset",
+		"body": ["//! Sequential process; no reset",
+			"always_ff @( posedge ${1:i_clk} ) begin : ${2:p_sync_}",
+			"\t$0",
+			"end"
+		]
+	},
+
+	"FSM signal declaration": {
+		"prefix": "FSM signal declaration",
+		"body": ["//! FSM current state, next state",
+		"localparam G_NUM_STATES = 4;",
+		"typedef enum logic [\\$clog2(G_NUM_STATES)-1:0] {",
+		"\tIDLE, ",
+		"\tSTATE1",
+		"\tSTATE2",
+		"\tSTATE3",
+		"} fsm_t;",
+		"fsm_t r_fsm_cs, w_fsm_ns;" ]
+	},
+
+	"case statement": {
+		"prefix": "case statement",
+		"body": [
+			"case(${1:vector})\n",
+			"\tdefault : begin\n\t",
+			"\tend\n",
+			"\t${2:case0} : begin\n\t",
+			"\tend\n",
+			"\t${3:case1} : begin\n\t",
+			"\tend\n",
+			"endcase" ]
+	},
+
+	"FSM combinatorial state update": {
+		"prefix": "FSM comb state update",
+		"body": ["//! FSM combinatorial state update",
+			"case(r_fsm_cs)\n",
+			"\tdefault : w_fsm_ns = IDLE;\n",
+			"\tIDLE : begin",
+			"\t\tif (${1:trigger}) begin",
+			"\t\t\tw_fsm_ns = $0;",
+			"\t\tend else begin",
+			"\t\t\tw_fsm_ns = IDLE;",
+			"\t\tend",
+			"\tend\n",
+			"endcase" ]
+	},
+
+	"FSM seq state update": {
+		"prefix": "FSM seq state update",
+		"body": ["//! FSM sequential assignments",
+			"case(r_fsm_cs)\n",
+			"\tdefault : r_fsm_cs <= IDLE;\n",
+			"\tIDLE : begin",
+			"\t\tif (${1:trigger}) begin",
+			"\t\t\tr_fsm_cs <= $0;",
+			"\t\tend else begin",
+			"\t\t\tr_fsm_cs <= IDLE;",
+			"\t\tend",
+			"\tend\n",
+			"endcase" ]
+	},
+
+	"FSM state outputs": {
+		"prefix": "FSM state outputs",
+		"body": ["//! FSM state-dependent outputs",
+			"case(${2:r_fsm_cs})\n",
+			"\tdefault : begin",
+			"\t\t$0",
+			"\tend\n",
+			"\tIDLE : begin\n\t\t",
+			"\tend\n",
+			"\tSTATE1 : begin\n\t\t",
+			"\tend\n",
+			"endcase" ]
+	},
+
+	"logic r_": {
+		"prefix": "logic r_",
+		"body": ["//! ",
+			"logic             r_${1:flag};\n" ]
+	},	
+
+	"logic [] r_": {
+		"prefix": "logic [] r_",
+		"body": ["//! ",
+			"logic [${1:G_IWS-1}:0] r_${2:count};\n" ]
+	},
+
+	"logic w_": {
+		"prefix": "logic w_",
+		"body": ["//! ",
+			"logic             w_${1:flag};\n" ]
+	},	
+
+	"logic [] w_": {
+		"prefix": "logic [] w_",
+		"body": ["//! ",
+			"logic [${1:G_IWS-1}:0] w_${2:count};\n" ]
+	},
+
+	"array unpacked": {
+		"prefix": "array unpacked",
+		"body": ["//! unpacked array",
+			"localparam G_ARRAY_DEPTH = 4;",
+			"logic [${1:G_IWS-1}:0] r_${2:array} [G_ARRAY_DEPTH];\n" ]
+	},
+
+	"module AXIS async reset": {
+		"prefix": "module AXIS async reset",
+		"body": ["module ${1:my_module} #(",
+			"\t//! Input and output word sizes",
+			"\tparameter int G_IWS = 32,",
+			"\tparameter int G_OWS = 32",
+			")(",
+			"\t//! Clock and synchronous reset",
+			"\tinput  logic             i_clk,",
+			"\tinput  logic             i_arst_n,",
+			"\t//! AXI stream slave input port",
+			"\tinput  logic [G_IWS-1:0] i_s_axis_tdata,",
+			"\tinput  logic             i_s_axis_tvalid,",
+			"\toutput logic             o_s_axis_tready,",
+			"\t//! AXI stream master output port",
+			"\toutput logic [G_OWS-1:0] o_m_axis_tdata,",
+			"\toutput logic             o_m_axis_tvalid,",
+			"\tinput  logic             i_m_axis_tready",
+			");\n\n",
+			"//! Signal area ---------------------------\n\n\n",
+			"//! Submodule instances -------------------\n\n\n",
+			"//! Process area --------------------------\n\n\n",
+			"endmodule\n" ]
+	},
+
+	"module AXIS sync reset": {
+		"prefix": "module AXIS sync reset",
+		"body": ["module ${1:my_module} #(",
+			"\t//! Input and output word sizes",
+			"\tparameter int G_IWS = 32,",
+			"\tparameter int G_OWS = 32",
+			")(",
+			"\t//! Clock and synchronous reset",
+			"\tinput  logic             i_clk,",
+			"\tinput  logic             i_srst_n,",
+			"\t//! AXI stream slave input port",
+			"\tinput  logic [G_IWS-1:0] i_s_axis_tdata,",
+			"\tinput  logic             i_s_axis_tvalid,",
+			"\toutput logic             o_s_axis_tready,",
+			"\t//! AXI stream master output port",
+			"\toutput logic [G_OWS-1:0] o_m_axis_tdata,",
+			"\toutput logic             o_m_axis_tvalid,",
+			"\tinput  logic             i_m_axis_tready",
+			");\n\n",
+			"//! Signal area ---------------------------\n\n\n",
+			"//! Submodule instances -------------------\n\n\n",
+			"//! Process area --------------------------\n\n\n",
+			"endmodule\n" ]
+	},
+
+
+
+
+}
