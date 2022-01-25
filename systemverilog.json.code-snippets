@@ -59,17 +59,11 @@
 		]
 	},
 
-	"FSM signal declaration": {
-		"prefix": "FSM signal declaration",
-		"body": ["//! FSM current state, next state",
-		"localparam G_NUM_STATES = 4;",
-		"typedef enum logic [\\$clog2(G_NUM_STATES)-1:0] {",
-		"\tIDLE, ",
-		"\tSTATE1",
-		"\tSTATE2",
-		"\tSTATE3",
-		"} fsm_t;",
-		"fsm_t r_fsm_cs, w_fsm_ns;" ]
+	"array unpacked": {
+		"prefix": "array unpacked",
+		"body": ["//! unpacked array",
+			"localparam G_ARRAY_DEPTH = 4;",
+			"logic [${1:G_IWS-1}:0] r_${2:array} [G_ARRAY_DEPTH];\n" ]
 	},
 
 	"case statement": {
@@ -83,6 +77,19 @@
 			"\t${3:case1} : begin\n\t",
 			"\tend\n",
 			"endcase" ]
+	},
+
+	"FSM signal declaration": {
+		"prefix": "FSM signal declaration",
+		"body": ["//! FSM current state, next state",
+		"localparam G_NUM_STATES = 4;",
+		"typedef enum logic [\\$clog2(G_NUM_STATES)-1:0] {",
+		"\tIDLE, ",
+		"\tSTATE1",
+		"\tSTATE2",
+		"\tSTATE3",
+		"} fsm_t;",
+		"fsm_t r_fsm_cs, w_fsm_ns;" ]
 	},
 
 	"FSM combinatorial state update": {
@@ -151,13 +158,6 @@
 		"prefix": "logic [] w_",
 		"body": ["//! ",
 			"logic [${1:G_IWS-1}:0] w_${2:count};\n" ]
-	},
-
-	"array unpacked": {
-		"prefix": "array unpacked",
-		"body": ["//! unpacked array",
-			"localparam G_ARRAY_DEPTH = 4;",
-			"logic [${1:G_IWS-1}:0] r_${2:array} [G_ARRAY_DEPTH];\n" ]
 	},
 
 	"module AXIS async reset": {
